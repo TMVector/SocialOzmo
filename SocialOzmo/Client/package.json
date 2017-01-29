@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "devDependencies": {
+    "fable-compiler": "^0.7.7",
+    "fable-core": "^0.7.6",
+    "fable-plugins-nunit": "^0.7.1",
+    "fable-powerpack": "^0.0.19"
+  },
+  "scripts": {
+    "prepublish": "yarn run build",
+    "build": "fable --target umd",
+    "watch": "fable --target umd --watch",
+    "test": "fable --target test"
+  }
+}

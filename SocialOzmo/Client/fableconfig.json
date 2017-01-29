@@ -1,0 +1,17 @@
+{
+    "sourceMaps": true,
+    "includeJs": true,
+    "targets": {
+      "umd": {
+        "projFile": "./ozmo.fsx",
+        "rollup": {
+          "dest": "./public/bundle.js",
+          "format": "umd"
+        },
+        "external": [ "rickshaw" ],
+        "globals": {
+            "rickshaw": "Rickshaw"
+        }
+      }
+    }
+}
