@@ -9,10 +9,12 @@
   "scripts": {
     "prepublish": "yarn run build",
     "build": "fable --target umd",
+    "build2": "fable --target other",
     "watch": "fable --target umd --watch",
     "test": "fable --target test"
   },
   "dependencies": {
-    "pusher-platform-js": "^0.0.3"
+    "pusher-platform-js": "^0.0.3",
+    "rickshaw": "^1.6.0"
   }
 }

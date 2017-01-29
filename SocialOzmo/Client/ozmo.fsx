@@ -16,6 +16,58 @@
 open Fable.Core
 open Fable.Import
 
+#r "../../node_modules/fable-core/Fable.Core.dll"
+#r "../../node_modules/fable-powerpack/Fable.PowerPack.dll"
+#I __SOURCE_DIRECTORY__
+//#load "pusher.fs"
+//open G.PusherPlatform
+open Fable.Import
+open Fable.Core.JsInterop
+open Fable.PowerPack
+
+
+// Set up app
+let appId = "e7861df8-5d11-462b-acb2-19a72a5335de"
+let pusher =
+    // HACK - we will have to do everything dynamically since we can't get Fable to see the package at compile time
+    let helpMe = importMember<string->obj> "./help.js"
+    helpMe(appId)
+
+let getFeed feedName =
+    pusher?feed(feedName)
+let subscribe feed onOpen onItem onError =
+    feed?subscribe(
+        createObj
+            [   "onOpen" ==> onOpen
+                "onItem" ==> onItem
+                "onError" ==> onError ])
+let append feed item =
+    feed?append(item)
+        ?``then``(fun response -> Browser.console.log("Successfully appended:", response); Promise.lift())
+        ?catch(fun err -> Browser.console.error("Error when appending:", err))
+
+
+type scoreRecord =
+    {   duration : float;
+        date : string; }
+    
+let scorePane = Browser.document.getElementById("scores")
+let addItem (v:scoreRecord) =
+    let el = Browser.document.createElement("li")
+    el.innerHTML <- (sprintf "%s  -  " v.date) + string v.duration
+    scorePane.appendChild(el)
+
+// Subscribe to a feed
+let scoreFeed = getFeed "scores"
+subscribe scoreFeed
+    (fun () -> Browser.console.log("Connection established"))
+    (fun (item:obj) -> addItem ((item?body :> obj) :?> scoreRecord)
+    ) // FIXME add these items to the score display
+    (fun error -> Browser.console.error("Pusher error: ", error))
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 module Keyboard =
   let mutable keysPressed = Set.empty
   let code x = if keysPressed.Contains(x) then 1 else 0
@@ -100,7 +152,8 @@ The type is used for both falling blobs and for the player's blob:
 type Blob =
   { X:float; Y:float;
     vx:float; vy:float;
-    Radius:float; color:string }
+    Radius:float; color:string;
+    StartTime:float; }
 (**
 Drawing blob on the canvas is quite easy - the following function does that using
 the `arc` function of the 2D rendering context of the canvas:
@@ -179,9 +232,10 @@ let grow = "black"
 let shrink = "white"
 
 let newDrop color =
+  let time = 0.
   { X = JS.Math.random()*width*0.8 + (width*0.1)
     Y=600.; Radius=10.; vx=0.; vy = 0.0
-    color=color }
+    color=color; StartTime=time }
 
 let newGrow () = newDrop grow
 let newShrink () = newDrop shrink
@@ -249,14 +303,17 @@ states are simple:
 *)
 /// Starts a new game
 let rec game () = async {
+  let time = JS.Date.now()
   let blob =
     { X = 300.; Y=0.; Radius=50.;
-      vx=0.; vy=0.; color="black" }
+      vx=0.; vy=0.; color="black"; StartTime=time; }
   return! update blob [newGrow ()] 0 }
 
 /// Displays message and sleeps for 10 sec
-and completed () = async {
-  drawText ("COMPLETED",320.,300.)
+and completed startTime = async {
+  let duration = (JS.Date.now()) - startTime
+  drawText (sprintf "COMPLETED in %f" duration,320.,300.)
+  append scoreFeed { duration=duration/1000.; date=(JS.Date.Create().ToString()); } |> ignore
   do! Async.Sleep 10000
   return! game () }
 (**
@@ -296,8 +353,8 @@ and update blob drops countdown = async {
 
   // If the game completed, switch state
   // otherwise sleep and update recursively!
-  if blob.Radius > 150. then
-    return! completed()
+  if blob.Radius > 50. then
+    return! completed(blob.StartTime)
   else
     do! Async.Sleep(int (1000. / 60.))
     return! update blob drops countdown }
@@ -308,37 +365,3 @@ state using `Async.StartImmediate`:
 game () |> Async.StartImmediate
 
 
-
-#r "../../node_modules/fable-core/Fable.Core.dll"
-#r "../../node_modules/fable-powerpack/Fable.PowerPack.dll"
-#load "pusher.fs"
-open Fable.Import
-open Fable.Core.JsInterop
-open PusherPlatform
-open Fable.PowerPack
-
-// Set up app
-let appId = "e7861df8-5d11-462b-acb2-19a72a5335de"
-let pusher = App(AppOptions(appId))
-
-// Subscribe to a feed
-let feed = pusher.feed("playground")
-let sub =
-    feed.subscribe(
-        FeedSubscribeOptions(
-            onOpen = (fun () -> Browser.console.log("Connection established")),
-            onItem = (fun item -> Browser.console.log("Item: ", item)),
-            onError = (fun error -> Browser.console.log("Error: ", error))))
-
-// Append items to the feed
-feed.append("Hello, world!")
-|> Promise.bind (fun response -> Browser.console.log("Success:", response); Promise.lift())
-|> Promise.catch (fun err -> Browser.console.error("Error:", err))
-|> ignore
-    
-// You’re not limited to appending string values;
-// you can also append objects, arrays and numbers.
-feed.append(createObj [ "yourKey" ==> "your value" ])
-|> Promise.bind (fun response -> Browser.console.log("Success:", response); Promise.lift())
-|> Promise.catch (fun err -> Browser.console.error("Error:", err))
-|> ignore

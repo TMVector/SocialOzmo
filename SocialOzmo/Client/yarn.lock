@@ -663,6 +663,10 @@ cryptiles@2.x.x:
   dependencies:
     boom "2.x.x"
 
+d3@^3.5.16:
+  version "3.5.17"
+  resolved "https://registry.yarnpkg.com/d3/-/d3-3.5.17.tgz#bc46748004378b21a360c9fc7cf5231790762fb8"
+
 dashdash@^1.12.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
@@ -1475,6 +1479,12 @@ resolve@1.1.7:
 resolve@^1.1.6, resolve@^1.1.7, resolve@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.2.0.tgz#9589c3f2f6149d1417a40becc1663db6ec6bc26c"
+
+rickshaw@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/rickshaw/-/rickshaw-1.6.0.tgz#d991d2bcd1b9dd07e4700dee9b6961474053269f"
+  dependencies:
+    d3 "^3.5.16"
 
 rimraf@2, rimraf@~2.5.1, rimraf@~2.5.4:
   version "2.5.4"

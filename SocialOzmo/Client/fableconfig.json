@@ -10,7 +10,13 @@
         },
         "external": [ "pusher-platform-js" ],
         "globals": {
-            "pusher-platform-js": "PusherPlatform"
+          "pusher-platform-js": "PusherPlatform"
+        }
+      },
+      "other": {
+        "projFile": "./ozmo.fsx",
+        "rollup": {
+          "dest":  "./public/bundle.js"
         }
       }
     }

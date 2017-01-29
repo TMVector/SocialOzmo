@@ -61,6 +61,8 @@
     <None Include="Client\public\index.html" />
     <None Include="Client\fableconfig.json" />
     <None Include="Client\package.json" />
+    <Content Include="Client\pusher-platform-js.js" />
+    <Content Include="Client\help.js" />
     <Compile Include="Client\pusher.fs" />
     <None Include="Client\ozmo.fsx" />
     <Compile Include="Server\Program.fs" />
