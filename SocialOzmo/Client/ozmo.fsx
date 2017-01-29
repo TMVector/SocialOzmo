@@ -306,3 +306,39 @@ The last thing that we need to do is to start the game in the initial `game`
 state using `Async.StartImmediate`:
 *)
 game () |> Async.StartImmediate
+
+
+
+#r "../../node_modules/fable-core/Fable.Core.dll"
+#r "../../node_modules/fable-powerpack/Fable.PowerPack.dll"
+#load "pusher.fs"
+open Fable.Import
+open Fable.Core.JsInterop
+open PusherPlatform
+open Fable.PowerPack
+
+// Set up app
+let appId = "e7861df8-5d11-462b-acb2-19a72a5335de"
+let pusher = App(AppOptions(appId))
+
+// Subscribe to a feed
+let feed = pusher.feed("playground")
+let sub =
+    feed.subscribe(
+        FeedSubscribeOptions(
+            onOpen = (fun () -> Browser.console.log("Connection established")),
+            onItem = (fun item -> Browser.console.log("Item: ", item)),
+            onError = (fun error -> Browser.console.log("Error: ", error))))
+
+// Append items to the feed
+feed.append("Hello, world!")
+|> Promise.bind (fun response -> Browser.console.log("Success:", response); Promise.lift())
+|> Promise.catch (fun err -> Browser.console.error("Error:", err))
+|> ignore
+    
+// You’re not limited to appending string values;
+// you can also append objects, arrays and numbers.
+feed.append(createObj [ "yourKey" ==> "your value" ])
+|> Promise.bind (fun response -> Browser.console.log("Success:", response); Promise.lift())
+|> Promise.catch (fun err -> Browser.console.error("Error:", err))
+|> ignore

@@ -11,5 +11,8 @@
     "build": "fable --target umd",
     "watch": "fable --target umd --watch",
     "test": "fable --target test"
+  },
+  "dependencies": {
+    "pusher-platform-js": "^0.0.3"
   }
 }

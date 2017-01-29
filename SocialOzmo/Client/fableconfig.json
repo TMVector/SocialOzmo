@@ -8,9 +8,9 @@
           "dest": "./public/bundle.js",
           "format": "umd"
         },
-        "external": [ "rickshaw" ],
+        "external": [ "pusher-platform-js" ],
         "globals": {
-            "rickshaw": "Rickshaw"
+            "pusher-platform-js": "PusherPlatform"
         }
       }
     }
