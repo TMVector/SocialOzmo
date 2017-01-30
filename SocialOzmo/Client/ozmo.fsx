@@ -38,7 +38,8 @@ let getFeed feedName =
 let subscribe feed onOpen onItem onError =
     feed?subscribe(
         createObj
-            [   "onOpen" ==> onOpen
+            [   "lastEventId" ==> "0"
+                "onOpen" ==> onOpen
                 "onItem" ==> onItem
                 "onError" ==> onError ])
 let append feed item =
